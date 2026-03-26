@@ -1,108 +1,102 @@
-# Stage231: Multi-Signer (Distributed Trust)
+# Stage232: Threshold Signature (2-of-3)
 
 ## Overview
 
-Stage231 introduces **multi-party signatures** to the QSP verification pipeline.
+This stage introduces **threshold-based signature verification**.
 
-Instead of relying on a single signer, the same payload is signed by multiple independent parties:
+Instead of requiring all signers, verification succeeds if a defined number of signatures are present.
 
-- Owner (project maintainer)
-- Third-party (external auditor/operator)
-- Researcher (independent reviewer)
+Example:
 
-This enables **distributed trust** and stronger auditability.
+- 3 total signers
+- 2 required signatures
+
+👉 This models **real-world distributed trust**
 
 ---
 
 ## Concept
 
-Traditional model:
+Previous stage:
 
 
-Evidence
-→ Signature (single)
-→ Trust depends on one entity
+Multi-Signer (Stage231)
+→ All signatures required
 
 
-Stage231:
+This stage:
 
 
-Evidence
-→ Multiple Signatures
-→ Independent verification
-→ Distributed trust
+Threshold Signer (Stage232)
+→ Partial signatures allowed (e.g., 2-of-3)
 
 
 ---
 
-## What is Signed
+## Why This Matters
 
-A canonical JSON payload:
-
-- log_id
-- tree_size
-- merkle_root
-- generated_at_utc
+- Real systems rarely require unanimous agreement
+- Enables fault tolerance
+- Enables distributed authority
+- Foundation for real-world governance models
 
 ---
 
-## Quick Start
+## Threshold Policy
 
-```bash
-git clone https://github.com/mokkunsuzuki-code/stage231.git
-cd stage231
+Defined in:
 
-./tools/run_stage231_multi_signer.sh
-pytest -q
-Output
-out/multi_signer/
-├── payload.json
-└── signed_bundle.json
-Example Result
-[OK] valid signature: owner
-[OK] valid signature: third_party
-[OK] valid signature: researcher
-[OK] valid_count: 3
-[OK] multi-signer verification passed
-Verification Logic
 
-A verifier can:
+threshold/config.yaml
 
-Check payload hash
-Verify each signature independently
-Identify signer roles
-Count valid signatures
-Policy Flexibility
 
-Possible verification policies:
+Example:
 
-Require ≥1 signature
-Require ≥2 signatures
-Require all signatures
-Security Value
+```yaml
+threshold_policy:
+  required_signers: 2
+  total_signers: 3
+How It Works
 
-This stage does NOT introduce new cryptography.
+Verification logic:
 
-It improves:
+if provided_signatures >= required_signers:
+    PASS
+else:
+    FAIL
+Run
+./tools/run_stage232_threshold.sh
 
-Trust distribution
-Audit transparency
-Reviewer independence
-Evidence credibility
-Architecture Evolution
-Stage230:
-Single proof authenticity
+Expected output:
 
-Stage231:
-Multi-party attested authenticity
+[OK] Threshold satisfied
+Structure
+stage232/
+├── threshold/
+│   └── config.yaml
+├── tools/
+│   ├── verify_threshold.py
+│   └── run_stage232_threshold.sh
+Security Perspective
+
+This stage introduces:
+
+Partial trust acceptance
+Distributed verification
+Flexible security policies
 Limitations
-Uses Ed25519 (standard signatures)
-Not a threshold signature scheme yet
-Signers are simulated (local keys)
-Future Work
-Threshold signatures (Stage232)
-Real external signers
-Policy enforcement (M-of-N)
+Signatures are currently simulated
+No cryptographic verification yet
+No identity binding
+Next Stage
+
+Stage233:
+
+👉 External Signatures
+
+GitHub identity
+Real keys
+Researcher validation
 License
 
 MIT License
