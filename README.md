@@ -1,146 +1,108 @@
-# QSP Stage227 – Attack Simulation with Continuous Verification
+# QSP Stage228 — Fail Evidence Persistence
 
-## Overview
+This stage introduces **fail evidence persistence** to the QSP verification pipeline.
 
-Stage227 extends the minimal executable PoC (Stage226) by introducing **attack simulation** and **continuous verification via GitHub Actions**.
+Instead of only detecting failures, Stage228 ensures that failures are:
 
-This stage demonstrates not only that the system works under normal conditions, but also that it **detects integrity violations under adversarial conditions**.
-
----
-
-## Key Concept
-
-
-Normal Execution
-→ Verification Pass
-
-Tampered Execution
-→ Verification Fail (Detected)
-
+- recorded
+- hashed (SHA256)
+- stored as tamper-evident evidence
+- verifiable later
 
 ---
 
-## What This Stage Proves
+## 🔍 Concept
 
-- The system can detect **tampering of critical files**
-- Integrity violations are **deterministically detected**
-- Attack scenarios are **explicitly defined and reproducible**
-- Results are **recorded as structured evidence**
-- Verification can run **continuously via CI (GitHub Actions)**
+Flow:
 
----
-
-## Attack Simulation Model
-
-Attack scenarios are defined in:
-
-
-attacks/attack_scenarios.json
-
-
-Example:
-
-- Modify `claims/claims.yaml`
-- Modify `README.md`
-- Run baseline verification (no tampering)
-
-Each scenario defines:
-
-- target file
-- attack type
-- expected result (pass/fail)
+Attack  
+↓  
+Fail Detection  
+↓  
+Log Persistence  
+↓  
+SHA256 Hashing  
+↓  
+Evidence Fixation  
 
 ---
 
-## Execution
-
-### Run locally
-
-```bash
-./tools/run_stage227.sh
-Output
-out/attacks/attack_report.json
-
-Example:
-
-{
-  "summary": {
-    "scenario_count": 3,
-    "passed": 3,
-    "failed": 0,
-    "overall_success": true
-  }
-}
-CI Integration (GitHub Actions)
-
-This stage includes automated execution via:
-
-.github/workflows/stage227-attack-simulation.yml
-
-On every:
-
-push
-pull request
-manual trigger
-
-The system:
-
-Runs attack simulation
-Verifies integrity behavior
-Uploads evidence as artifact
-Why This Matters
-
-Traditional PoC:
-
-Demonstrates functionality
+## 🎯 Goal
 
 Stage227:
+- Detect failure
 
-Demonstrates failure detection under attack
-Provides continuous, reproducible security validation
+Stage228:
+- Preserve failure as **tamper-evident forensic evidence**
 
-This shifts the system from:
+This enables:
 
-"It works"
+- forensic analysis
+- auditability
+- reproducible verification
+- claim → attack → evidence traceability
 
-to:
+---
 
-"It fails correctly under attack — and we can prove it continuously"
+## 🚀 Quick Start
 
-Security Perspective
+Run the full pipeline:
 
-This stage introduces a minimal but important property:
+```bash
+./tools/run_stage228_fail_evidence.sh
+✅ Verification
 
-Tamper Detection
-Reproducible Adversarial Testing
-Evidence-based Validation
-Structure
-attacks/
-  attack_scenarios.json
+Verify that stored evidence matches original logs:
 
-tools/
-  run_attack_simulation.py
-  run_stage227.sh
+python3 tools/verify_fail_evidence.py --index out/fail_evidence/index.json
+
+If logs are modified, verification will fail.
+
+📂 Output
+
+Generated artifacts:
 
 out/
-  attacks/
-    attack_report.json
+├── failures/
+│   └── downgrade_fail.log
+├── fail_evidence/
+│   ├── downgrade_fail.evidence.json
+│   └── index.json
+🧪 Tests
 
-.github/workflows/
-  stage227-attack-simulation.yml
-Limitations
-Simplified attack model (file tampering only)
-No network or cryptographic attack simulation yet
-Designed as minimal reproducible framework
-Next Steps
+Run all tests:
 
-Future stages may include:
+pytest -q
+🔐 Security Meaning
 
-Cryptographic attack scenarios
-Network-level adversarial simulation
-Formal verification linkage
-Real protocol integration
-License
+This stage transforms failure into:
+
+👉 tamper-evident evidence
+
+Properties:
+
+Integrity (SHA256)
+Reproducibility
+Detectable modification
+External verifiability
+📈 Evolution
+
+Stage226 — Executable system
+Stage227 — Fail detection
+Stage228 — Fail evidence persistence ← You are here
+
+⚠️ Scope
+
+This is not a full protocol security proof.
+
+It is a reproducible framework for:
+
+detecting failures
+preserving them as evidence
+enabling independent verification
+📜 License
 
 MIT License
-Copyright (c) 2025
+© 2025 Motohiro Suzuki
+
+EOF
