@@ -1,82 +1,80 @@
-（# Stage235: GitHub Verified Commit (GPG Identity Binding)
+# Stage235: GitHub Verified Commit (GPG Identity Binding)
 
-This stage binds local GPG signing keys to a GitHub account,
-enabling "Verified" commit status on GitHub.
+This stage binds a local GPG signing key to a GitHub account,
+enabling GitHub to display **Verified** status for signed commits.
 
 ## Overview
 
 Stage234 introduced real cryptographic signing using:
 
-- Ed25519 keys (repository-level identity)
-- GPG keys (identity-based signing)
+- Ed25519 keys for repository-level signing
+- GPG keys for identity-based signing
 
-Stage235 extends this by:
-
-- Linking GPG public key to GitHub account
-- Enabling GitHub-side signature verification
-- Making commit authorship visibly verifiable
+Stage235 extends this by linking the GPG public key to GitHub,
+so that signed commits can be verified on the GitHub platform itself.
 
 ## What This Enables
 
-- GitHub "Verified" badge on commits
-- Stronger authorship authenticity
+- GitHub **Verified** badge on commits
+- Stronger commit authorship authenticity
 - Public auditability of commit origin
-- Alignment with real-world developer identity
+- Platform-level identity binding for signed commits
 
 ## Verification Flow
 
-Local commit (signed with private key)
-↓
-GitHub receives commit
-↓
-GitHub matches public key
-↓
-**Verified badge displayed**
+Local commit signed with private GPG key  
+↓  
+GitHub receives the signed commit  
+↓  
+GitHub matches the signature to the registered public key  
+↓  
+**Verified** badge is displayed
 
 ## Requirements
 
-- GPG key pair (created locally)
-- Public key registered on GitHub
-- Git configured to use signing key
-- Verified email address on GitHub
+- Local GPG key pair
+- Public GPG key registered on GitHub
+- Git configured to use the signing key
+- Verified email address on GitHub matching the GPG identity
 
-## Setup (Local)
+## Local Setup
 
-### 1. Check GPG key
+### 1. Check the GPG key
 
 ```bash
 gpg --list-secret-keys --keyid-format=long
-2. Set signing key
-git config --global user.signingkey <KEY_ID>
+2. Configure Git signing
+git config --global user.name "Motohiro Suzuki"
+git config --global user.email "mokkun.suzuki@gmail.com"
+git config --global user.signingkey 395BFEB61D50FB25
 git config --global commit.gpgsign true
 3. Ensure GPG agent works
 export GPG_TTY=$(tty)
 Export Public Key
-gpg --armor --export <KEY_ID> > gpg_pubkeys/stage235_github_public.asc
+gpg --armor --export 395BFEB61D50FB25 > gpg_pubkeys/stage235_github_public.asc
 
-👉 このファイルを GitHub に登録
+Register the exported public key on GitHub:
 
-GitHub:
 Settings → SSH and GPG keys → New GPG key
 
-Test Signed Commit
-git commit -S -m "Stage235: signed commit"
+Create a Signed Commit
+git commit -S -m "Stage235: GitHub Verified commit (GPG identity binding)"
 git push
 Expected Result
 
-GitHub上で👇
+On GitHub, the commit should display:
 
-👉 Verified 表示
+Verified
 
-Important Notes
-Verified = GitHubが署名を検証した状態
-完全な身元保証ではないが、強い本人性証明
-秘密鍵は絶対に公開しない
+Verification Notes
+Verified means GitHub successfully verified the commit signature
+This is a strong proof of commit authenticity on the platform
+It is not an absolute real-world identity guarantee
+Private keys must never be committed
 Stage Progression
-
-Stage234 → Cryptographic signing (Ed25519 + GPG)
-Stage235 → GitHub identity verification (Verified commits)
-
+Stage233 → External signature verification structure
+Stage234 → Real cryptographic signing with Ed25519 and GPG
+Stage235 → GitHub platform-level verified commit identity
 Security Model Extension
 
 The system now binds:
@@ -89,12 +87,12 @@ Manifest
 ↓
 Signature
 ↓
-GitHub Identity Verification
+GitHub Verified Identity
 
-This connects cryptographic proof with platform-level identity.
+This connects cryptographic proof with platform-level identity verification.
 
 License
 
 MIT License
 
-© 2025 Motohiro Suzuki）
+© 2025 Motohiro Suzuki
